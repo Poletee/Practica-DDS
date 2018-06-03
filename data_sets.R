@@ -1,4 +1,10 @@
 library(stringr) #++dplyr
+library(iptools)
+list.category <- function(IPS){
+  print (dplyr::distinct(IPS[2]))
+}
+
+list.category(IPS)
 
 setwd("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\blocklist-ipsets-master") # WORKING DIRECTORY
 src.files <- list.files() # LLEGIR FITXERS DEL WORKING DIRECTORY
@@ -16,28 +22,25 @@ for (file_name in src.files){
   }
 }
 
-file_name <- "country_ad.netset"
-
 setwd("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips") # WORKING DIRECTORY
 src.files <- list.files()
-
+countries <- NULL
 for (file_name in src.files){
   file_info <- read.table(file=file_name, comment.char="/", sep = "\t", stringsAsFactors = F,nrows=50 )
   country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
-  tmp <- read.table(file = paste("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips",file_name, 
-                                 sep = "\\"),skipNul = T, na.strings = "NULL", col.names = c("Country"), stringsAsFactors = T)
+  tmp2 <- read.table(file = paste("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips",file_name, 
+                                 sep = "\\"),skipNul = T, na.strings = "NULL", col.names = c("range"), stringsAsFactors = F, row.names= NULL)
+  for (ip in tmp2) {
+    tmp_boundary <- range_boundaries(ip)
+    tmp2$min <- tmp_boundary[1]
+    tmp2$max <- tmp_boundary[2]
+  }
   if(nrow(country_tmp) > 0) {
     country <- stringr::str_trim(stringr::str_split(country_tmp$V1, "#")[[1]][2])
     country <- stringr::str_trim(stringr::str_split(country, ",")[[1]][1])
     print(file_name)
-    #bucle per IP?
-    if(dplyr::filter(IPS, ip == "1.0.109.2")){ #anar iterant per IP
-      IPS <- rbind(IPS, tmp) ###ASIGNAR PAÍS A LA IP a partir de l'índex
-    }
   }
+  tmp2$country <- rep(x = country, nrow(tmp2))
+  countries <- rbind(countries,tmp2)
 }
 
-
-if(dplyr::filter(IPS, ip == "1.0.109.2")){
-  IPS$country[1] <- country
-}
