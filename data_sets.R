@@ -26,12 +26,18 @@ for (file_name in src.files){
   country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
   tmp <- read.table(file = paste("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips",file_name, 
                                  sep = "\\"),skipNul = T, na.strings = "NULL", col.names = c("Country"), stringsAsFactors = T)
-  
   if(nrow(country_tmp) > 0) {
-    country <- stringr::str_trim(stringr::str_split(country_tmp$V1, ",")[[1]][1])
-    tmp$country <- rep(x = country, nrow(tmp))
+    country <- stringr::str_trim(stringr::str_split(country_tmp$V1, "#")[[1]][2])
+    country <- stringr::str_trim(stringr::str_split(country, ",")[[1]][1])
     print(file_name)
-    IPS <- rbind(IPS, tmp)
+    #bucle per IP?
+    if(dplyr::filter(IPS, ip == "1.0.109.2")){ #anar iterant per IP
+      IPS <- rbind(IPS, tmp) ###ASIGNAR PAÍS A LA IP a partir de l'índex
+    }
   }
 }
 
+
+if(dplyr::filter(IPS, ip == "1.0.109.2")){
+  IPS$country[1] <- country
+}
