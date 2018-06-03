@@ -1,10 +1,10 @@
 library(stringr) #++dplyr
 library(iptools)
+
 list.category <- function(IPS){
   print (dplyr::distinct(IPS[2]))
 }
 
-list.category(IPS)
 
 setwd("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\blocklist-ipsets-master") # WORKING DIRECTORY
 src.files <- list.files() # LLEGIR FITXERS DEL WORKING DIRECTORY
@@ -25,8 +25,9 @@ for (file_name in src.files){
 setwd("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips") # WORKING DIRECTORY
 src.files <- list.files()
 countries <- NULL
+
 for (file_name in src.files){
-  file_info <- read.table(file=file_name, comment.char="/", sep = "\t", stringsAsFactors = F,nrows=50 )
+  file_info <- read.table(file=file_name, comment.char="/", sep = "\t", stringsAsFactors = F,nrows=50, row.names = NULL)
   country_tmp <- dplyr::filter(file_info, stringr::str_detect(V1,"--"))
   tmp2 <- read.table(file = paste("C:\\Users\\Goordi\\Desktop\\master\\datadriven\\geoips",file_name, 
                                  sep = "\\"),skipNul = T, na.strings = "NULL", col.names = c("range"), stringsAsFactors = F, row.names= NULL)
@@ -43,4 +44,3 @@ for (file_name in src.files){
   tmp2$country <- rep(x = country, nrow(tmp2))
   countries <- rbind(countries,tmp2)
 }
-
